@@ -13,6 +13,38 @@
   * 对于只有射频前端的雷达传感器，一般是通过SPI/I2C接口向其发送控制及配置指令，并通过CSI2/LVDS接口输出原始数据。其中SPI接口可以用DCA1000板载的FTDI芯片转为USB协议直接用电脑控制，LVDS接口的数据也能用DCA1000板载的FPGA采集并转为UDP包通过以太网传输。本仓库实现了上述所有操作。
   * 对于自带片上ARM及DSP的雷达传感器，则可以烧录控制程序，用片上ARM对雷达传感器进行配置，用片上DSP处理原始数据并得到点云等数据，通过UART传输。其中原始数据除了送入片上DSP，还能配置为通过LVDS接口输出，并利用DCA1000板载的FPGA采集。本仓库实现了上述所有操作。当然，自带片上ARM及DSP的雷达传感器也有SPI/I2C等接口，也可以利用该接口对雷达传感器进行配置，并通过DCA1000板载的FTDI将SPI转为USB用电脑控制。[mmwaveStudio](https://www.ti.com/tool/MMWAVE-STUDIO)就是这样做的，但本仓库暂未实现该方法，可参考[mmWave-DFP](https://www.ti.com/tool/MMWAVE-DFP)自行实现。
 
+## Introduction (English)
+This module is mainly divided into two parts: mmwave and fpga_udp.
+
+* mmwave is adapted from OpenRadar and is responsible for configuration file parsing, UART data transmission/reception, raw data parsing, and related functions.
+
+* fpga_udp is adapted from a pybind11 example and mmWave-DFP-2G. It uses C-written socket code to receive high-speed raw data from the DCA1000 over Ethernet.
+For radar chips like AWR2243, which do not have on-chip DSP or ARM cores, it also implements USB-to-SPI command transmission via FTDI for firmware flashing, parameter configuration, and other SPI-based operations.
+
+### TI mmWave Radar Categories
+TI mmWave radar sensors are mainly divided into two categories:
+
+* RF front-end only: such as AWR1243, AWR2243, etc. With built-in ARM, DSP/HWA: such as xWR1443, xWR6443, xWR1843, xWR6843, AWR2944, etc. For RF Front-End Only Radar Sensors
+These sensors are usually controlled/configured via SPI/I2C, and output raw ADC data via CSI2/LVDS interfaces. The SPI interface can be converted to USB using the DCA1000's onboard FTDI chip, enabling control via a PC.
+The LVDS data can be captured by the DCA1000's onboard FPGA, converted into UDP packets, and sent over Ethernet.
+This repository implements all of the above operations.
+
+* For Radar Sensors with On-Chip ARM and DSP
+
+You can:
+
+* Flash a control program,
+
+Use the on-chip ARM core to configure the radar sensor, Use the on-chip DSP to process raw data into point clouds, Transmit data over UART.
+
+In addition:
+
+Raw data can be routed both to the on-chip DSP and out via LVDS, captured via the DCA1000 FPGA.
+
+This repository also supports these functionalities.
+
+Although these sensors also provide SPI/I2C interfaces and can technically be configured via SPI (using the DCA1000 FTDI for USB control), this method is not yet implemented in this repository.
+However, it is supported by TI’s mmWaveStudio, and you can refer to mmWave-DFP to implement it yourself.
 
 ## Prerequisites
 
